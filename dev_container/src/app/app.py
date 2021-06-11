@@ -86,7 +86,7 @@ def calc(x:float,y:float,head:float,v:float,delta:float):
     x = prediction[0]
     y = prediction[1]
     head = prediction[2]
-    output = str(x)+","+str(y)+","+str(head)
+    output = "$"+str(x)+"$"+str(y)+"$"+str(head)+"$"
     return {"prediction":output}
 
 @app.get("/simple")
