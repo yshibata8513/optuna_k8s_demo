@@ -1,0 +1,1 @@
+eksctl create cluster --region ap-northeast-1 --vpc-public-subnets subnet-0100e4a49c31c18cc,subnet-044699696894de1ab,subnet-08300a386edbd8db0 --name eks-work-cluster --version 1.19 --node-type t2.small --nodes 2 --nodes-min 1 --nodes-max 3

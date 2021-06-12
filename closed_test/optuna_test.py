@@ -21,6 +21,7 @@ def main():
     )
 
     study.optimize(objective, n_trials=100, n_jobs=1)
+    print(study.best_trial)
 
 if __name__ == '__main__':
     main()
