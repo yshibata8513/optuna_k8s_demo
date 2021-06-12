@@ -11,10 +11,11 @@ RUN apt install -y python3-pip
 
 RUN pip3 install numpy \
     subprocess.run \ 
-    optuna 
-
+    optuna \
+    psycopg2-binary
 
 COPY closed_test.cpp .
 RUN  g++ closed_test.cpp
 
 COPY optuna_test.py .
+COPY check_study.sh .
