@@ -19,3 +19,4 @@ RUN  g++ closed_test.cpp
 
 COPY optuna_test.py .
 COPY check_study.sh .
+COPY run.sh .

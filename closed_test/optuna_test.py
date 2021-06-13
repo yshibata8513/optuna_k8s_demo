@@ -2,6 +2,7 @@
 import optuna
 import numpy as np
 import subprocess
+import os
 
 
 def objective(trial):
@@ -15,12 +16,18 @@ def objective(trial):
 
 def main():
 
-    # optimize
-    study = optuna.create_study(
-        study_name="closed_test"
-    )
 
-    study.optimize(objective, n_trials=100, n_jobs=1)
+
+    study = optuna.load_study(
+        study_name="closed_test",
+        storage="postgresql://{}:{}@{}:5432/{}".format(
+            os.environ["POSTGRES_USER"],
+            os.environ["POSTGRES_PASSWORD"],
+            os.environ["POSTGRES_ENDPOINT"],
+            os.environ["POSTGRES_DB"],
+        ),
+    )
+    study.optimize(objective, n_trials=20)
     print(study.best_trial)
 
 if __name__ == '__main__':

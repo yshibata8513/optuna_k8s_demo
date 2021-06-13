@@ -8,7 +8,7 @@
 #   POSTGRES_PASSWORD: "superSecretPassword"
 #   POSTGRES_USER: "optuna"
 #   POSTGRES_DB: "optunaDatabase"
-# ---
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -71,8 +71,8 @@ spec:
                 name: postgres-secrets
       containers:
         - name: study-creator
-          image: optuna-kubernetes:example
-          imagePullPolicy: IfNotPresent
+          image: 278219960442.dkr.ecr.ap-northeast-1.amazonaws.com/optuna_closed_test:latest
+          imagePullPolicy: Always
           command:
           - /bin/sh
           - -c
@@ -80,7 +80,7 @@ spec:
           - -x
           - |
             optuna create-study --skip-if-exists --direction maximize \
-            --study-name "kubernetes" --storage \
+            --study-name "closed_test" --storage \
             "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:5432/${POSTGRES_DB}"
           envFrom:
             - secretRef:
@@ -97,27 +97,45 @@ spec:
       restartPolicy: OnFailure
       initContainers:
         - name: wait-for-study
-          image: optuna-kubernetes:example
-          imagePullPolicy: IfNotPresent
+          image: 278219960442.dkr.ecr.ap-northeast-1.amazonaws.com/optuna_closed_test:latest
+          imagePullPolicy: Always
           command:
-          - /bin/sh
-          - -c
-          - -e
-          - -x
-          - |
-            until [ `sh check_study.sh` -eq 0 ];
-            do echo "waiting for study"; sleep 2; done;
+            - /bin/sh
+            - -c
+            - -e
+            - -x
+            - |
+              until [ `sh check_study.sh` -eq 0 ];
+              do echo "waiting for study"; sleep 2; done;
           envFrom:
             - secretRef:
                 name: postgres-secrets
+
       containers:
-        - name: worker
-          image: optuna-kubernetes:example
-          imagePullPolicy: IfNotPresent
-          command:
-            - python
-            - sklearn_distributed.py
+
+        - name: predictor
+          image: 278219960442.dkr.ecr.ap-northeast-1.amazonaws.com/kinmatic_model:latest
+          imagePullPolicy: Always
+          # command:
+          #   - echo hello
+          # ports:
+          #   - containerPort: 8000
           envFrom:
             - secretRef:
                 name: postgres-secrets
+        - name: workers
+          image: 278219960442.dkr.ecr.ap-northeast-1.amazonaws.com/optuna_closed_test:latest
+          imagePullPolicy: Always
+          command:
+            - /bin/sh
+            - -c
+            - -e
+            - -x
+            - |
+              until [ `sh run.sh` -eq 0 ];
+              do echo "waiting for study"; sleep 2; done;
+          envFrom:
+            - secretRef:
+                name: postgres-secrets
+        
 ---
